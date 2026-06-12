@@ -73,6 +73,7 @@
                             <option value="draft"     @selected(request('status') === 'draft')>Brouillon</option>
                             <option value="sent"      @selected(request('status') === 'sent')>Envoyé</option>
                             <option value="confirmed" @selected(request('status') === 'confirmed')>Confirmé</option>
+                            <option value="cancelled" @selected(request('status') === 'cancelled')>Annulé</option>
                         </select>
                     </td>
                     <td class="px-4 py-2">
@@ -94,7 +95,7 @@
                     </td>
                     <td class="px-6 py-3 text-gray-600">{{ count($so->order_ids) }} commande(s)</td>
                     <td class="px-6 py-3">
-                        <span class="{{ $so->status === 'confirmed' ? 'badge-green' : ($so->status === 'sent' ? 'badge-blue' : 'badge-gray') }}">
+                        <span class="{{ $so->status === 'confirmed' ? 'badge-green' : ($so->status === 'sent' ? 'badge-blue' : ($so->status === 'cancelled' ? 'badge-red' : 'badge-gray')) }}">
                             {{ $so->status_label }}
                         </span>
                     </td>

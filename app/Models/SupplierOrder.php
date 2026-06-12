@@ -22,6 +22,7 @@ class SupplierOrder extends Model
         'draft'     => '✏️ Brouillon',
         'sent'      => '📨 Envoyé',
         'confirmed' => '✅ Confirmé',
+        'cancelled' => '❌ Annulé',
     ];
 
     public function getStatusLabelAttribute(): string

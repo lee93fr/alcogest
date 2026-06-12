@@ -4,12 +4,24 @@
 
 @section('header-actions')
     <a href="{{ route('admin.supplier-orders.pdf', $supplierOrder) }}" class="btn-secondary" target="_blank">📄 Télécharger PDF</a>
-    @if($supplierOrder->status !== 'confirmed')
+    @if($supplierOrder->status === 'draft' || $supplierOrder->status === 'sent')
     <form method="POST" action="{{ route('admin.supplier-orders.confirm', $supplierOrder) }}" class="inline">
         @csrf
         <button type="submit" class="btn-primary">✅ Marquer confirmé</button>
     </form>
+    <form method="POST" action="{{ route('admin.supplier-orders.cancel', $supplierOrder) }}" class="inline"
+          onsubmit="return confirm('Annuler le bon {{ $supplierOrder->reference }} ?')">
+        @csrf
+        <button type="submit" class="px-4 py-2 rounded-xl text-sm font-medium bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-100 transition-colors">
+            ❌ Annuler
+        </button>
+    </form>
     @endif
+    @if($supplierOrder->status === 'cancelled')
+    <form method="POST" action="{{ route('admin.supplier-orders.regenerate', $supplierOrder) }}" class="inline">
+        @csrf
+        <button type="submit" class="btn-primary">🔄 Régénérer</button>
+    </form>
     <form method="POST" action="{{ route('admin.supplier-orders.destroy', $supplierOrder) }}" class="inline"
           onsubmit="return confirm('Supprimer définitivement le bon {{ $supplierOrder->reference }} ?')">
         @csrf @method('DELETE')
@@ -17,6 +29,7 @@
             🗑 Supprimer
         </button>
     </form>
+    @endif
 @endsection
 
 @section('content')
@@ -92,7 +105,7 @@
             <div class="text-sm space-y-2">
                 <div class="flex justify-between">
                     <span class="text-gray-500">Statut</span>
-                    <span class="{{ $supplierOrder->status === 'confirmed' ? 'badge-green' : ($supplierOrder->status === 'sent' ? 'badge-blue' : 'badge-gray') }}">
+                    <span class="{{ $supplierOrder->status === 'confirmed' ? 'badge-green' : ($supplierOrder->status === 'sent' ? 'badge-blue' : ($supplierOrder->status === 'cancelled' ? 'badge-red' : 'badge-gray')) }}">
                         {{ $supplierOrder->status_label }}
                     </span>
                 </div>

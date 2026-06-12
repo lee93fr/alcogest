@@ -129,6 +129,8 @@ Route::middleware(['auth', 'role:admin,super_admin'])
     Route::get('bons-fournisseur/{supplierOrder}/pdf', [Admin\SupplierOrderController::class, 'downloadPdf'])->name('supplier-orders.pdf');
     Route::post('bons-fournisseur/{supplierOrder}/send', [Admin\SupplierOrderController::class, 'send'])->name('supplier-orders.send');
     Route::post('bons-fournisseur/{supplierOrder}/confirm', [Admin\SupplierOrderController::class, 'confirm'])->name('supplier-orders.confirm');
+    Route::post('bons-fournisseur/{supplierOrder}/cancel', [Admin\SupplierOrderController::class, 'cancel'])->name('supplier-orders.cancel');
+    Route::post('bons-fournisseur/{supplierOrder}/regenerate', [Admin\SupplierOrderController::class, 'regenerate'])->name('supplier-orders.regenerate');
     Route::delete('bons-fournisseur/{supplierOrder}', [Admin\SupplierOrderController::class, 'destroy'])->name('supplier-orders.destroy');
     Route::resource('bons-fournisseur', Admin\SupplierOrderController::class)
          ->parameters(['bons-fournisseur' => 'supplierOrder'])

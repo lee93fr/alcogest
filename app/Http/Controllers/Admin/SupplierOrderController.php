@@ -31,7 +31,10 @@ class SupplierOrderController extends Controller
 
     public function create()
     {
-        $existingOrderIds = SupplierOrder::pluck('order_ids')->flatten()->toArray();
+        $existingOrderIds = SupplierOrder::whereNot('status', 'cancelled')
+            ->pluck('order_ids')
+            ->flatten()
+            ->toArray();
 
         $orders = Order::with('user')
             ->whereNotIn('id', $existingOrderIds)
@@ -86,6 +89,24 @@ class SupplierOrderController extends Controller
     {
         $supplierOrder->update(['status' => 'confirmed']);
         return back()->with('success', 'Bon fournisseur confirmé.');
+    }
+
+    public function cancel(SupplierOrder $supplierOrder)
+    {
+        abort_if($supplierOrder->status === 'confirmed', 403, 'Un bon confirmé ne peut pas être annulé.');
+        $supplierOrder->update(['status' => 'cancelled']);
+
+        return back()->with('success', "Bon fournisseur {$supplierOrder->reference} annulé.");
+    }
+
+    public function regenerate(SupplierOrder $supplierOrder)
+    {
+        abort_if($supplierOrder->status !== 'cancelled', 403, 'Seul un bon annulé peut être régénéré.');
+
+        $newBon = $this->service->create($supplierOrder->order_ids, $supplierOrder->notes);
+
+        return redirect()->route('admin.supplier-orders.show', $newBon)
+            ->with('success', "Bon {$newBon->reference} régénéré depuis {$supplierOrder->reference}.");
     }
 
     public function destroy(SupplierOrder $supplierOrder)
