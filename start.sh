@@ -6,8 +6,8 @@ cd /app
 # Répertoires nécessaires
 mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
 
-# Permissions pour php-fpm (user ubuntu)
-chown -R ubuntu:ubuntu /app/storage /app/bootstrap/cache
+# Permissions pour php-fpm
+chown -R www-data:www-data /app/storage /app/bootstrap/cache 2>/dev/null || true
 chmod -R 775 storage bootstrap/cache
 
 # Symlink storage public
