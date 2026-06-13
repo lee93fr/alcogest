@@ -103,6 +103,8 @@ Route::middleware(['auth', 'role:admin,super_admin'])
     Route::patch('commandes/{order}/modifier', [Admin\OrderController::class, 'updateItems'])->name('orders.update-items');
     Route::patch('commandes/{order}/status', [Admin\OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::patch('commandes/{order}/payment', [Admin\OrderController::class, 'updatePayment'])->name('orders.update-payment');
+    Route::post('commandes/{order}/payments', [Admin\OrderController::class, 'storePayment'])->name('orders.payments.store');
+    Route::delete('commandes/{order}/payments/{payment}', [Admin\OrderController::class, 'destroyPayment'])->name('orders.payments.destroy');
     Route::post('commandes/{order}/stripe-link', [Admin\OrderController::class, 'generateStripeLink'])->name('orders.stripe-link');
     Route::delete('commandes/{order}', [Admin\OrderController::class, 'destroy'])->name('orders.destroy');
     Route::post('commandes/purge', [Admin\OrderController::class, 'purge'])->name('orders.purge');

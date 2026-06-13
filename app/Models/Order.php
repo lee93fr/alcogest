@@ -68,6 +68,19 @@ class Order extends Model
     public function statusHistories() { return $this->hasMany(OrderStatusHistory::class)->orderByDesc('changed_at'); }
     public function credits()         { return $this->hasMany(Credit::class); }
     public function promoCode()       { return $this->belongsTo(PromoCode::class); }
+    public function payments()        { return $this->hasMany(OrderPayment::class)->orderBy('paid_at'); }
+
+    public function getPaidAmountAttribute(): float
+    {
+        return (float) ($this->relationLoaded('payments')
+            ? $this->payments->sum('amount')
+            : $this->payments()->sum('amount'));
+    }
+
+    public function getRemainingAmountAttribute(): float
+    {
+        return max(0, (float) $this->total - $this->paid_amount);
+    }
 
     public function scopeForClient($query, int $userId) { return $query->where('user_id', $userId); }
     public function scopeByStatus($query, string $status) { return $query->where('status', $status); }

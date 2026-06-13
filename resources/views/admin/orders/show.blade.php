@@ -91,6 +91,120 @@
             </div>
         </div>
 
+        {{-- Règlements --}}
+        <div class="card overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 class="font-semibold text-gray-900">Règlements</h2>
+                <div class="flex items-center gap-3 text-sm">
+                    @php $paid = $order->paid_amount; $remaining = $order->remaining_amount; @endphp
+                    <span class="text-gray-500">Payé : <strong class="text-gray-900">{{ number_format($paid, 2, ',', ' ') }} €</strong></span>
+                    @if($remaining > 0)
+                    <span class="text-amber-600 font-semibold">Reste : {{ number_format($remaining, 2, ',', ' ') }} €</span>
+                    @else
+                    <span class="text-green-600 font-semibold">✅ Soldé</span>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Barre de progression --}}
+            @if($order->total > 0)
+            <div class="px-6 pt-3 pb-1">
+                @php $pct = min(100, round($paid / $order->total * 100)); @endphp
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div class="h-2 rounded-full transition-all {{ $pct >= 100 ? 'bg-green-500' : 'bg-amber-400' }}"
+                         style="width: {{ $pct }}%"></div>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">{{ $pct }}% réglé sur {{ number_format($order->total, 2, ',', ' ') }} €</p>
+            </div>
+            @endif
+
+            {{-- Liste des règlements --}}
+            @if($order->payments->count())
+            <table class="min-w-full divide-y divide-gray-100 text-sm mt-2">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Date</th>
+                        <th class="px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Mode</th>
+                        <th class="px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Réf.</th>
+                        <th class="px-6 py-2 text-right text-xs font-semibold text-gray-500 uppercase">Montant</th>
+                        <th class="px-6 py-2"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50 bg-white">
+                    @foreach($order->payments as $payment)
+                    <tr>
+                        <td class="px-6 py-2 text-gray-500 font-mono text-xs">{{ $payment->paid_at->format('d/m/Y') }}</td>
+                        <td class="px-6 py-2 text-gray-700">{{ $payment->method_label }}</td>
+                        <td class="px-6 py-2 text-gray-500 text-xs">{{ $payment->reference ?: '—' }}</td>
+                        <td class="px-6 py-2 text-right font-semibold text-gray-900">{{ number_format($payment->amount, 2, ',', ' ') }} €</td>
+                        <td class="px-6 py-2 text-right">
+                            <form method="POST" action="{{ route('admin.orders.payments.destroy', [$order, $payment]) }}"
+                                  onsubmit="return confirm('Supprimer ce règlement ?')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="text-red-400 hover:text-red-600 text-xs">✕</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @if($payment->notes)
+                    <tr class="bg-gray-50">
+                        <td colspan="5" class="px-6 py-1 text-xs text-gray-400 italic">{{ $payment->notes }}</td>
+                    </tr>
+                    @endif
+                    @endforeach
+                </tbody>
+            </table>
+            @else
+            <div class="px-6 py-4 text-sm text-gray-400">Aucun règlement enregistré.</div>
+            @endif
+
+            {{-- Formulaire d'ajout --}}
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3">Ajouter un règlement</p>
+                <form method="POST" action="{{ route('admin.orders.payments.store', $order) }}" class="space-y-3">
+                    @csrf
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Montant (€)</label>
+                            <input type="number" name="amount" step="0.01" min="0.01"
+                                   placeholder="{{ number_format($remaining, 2, '.') }}"
+                                   value="{{ old('amount') }}"
+                                   class="form-input text-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Date</label>
+                            <input type="date" name="paid_at" value="{{ old('paid_at', date('Y-m-d')) }}"
+                                   class="form-input text-sm" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Mode</label>
+                            <select name="method" class="form-input text-sm" required>
+                                @foreach(\App\Models\OrderPayment::METHOD_LABELS as $val => $label)
+                                    <option value="{{ $val }}" @selected(old('method') === $val)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Référence (optionnel)</label>
+                            <input type="text" name="reference" value="{{ old('reference') }}"
+                                   placeholder="n° chèque, ID virement…"
+                                   class="form-input text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Note (optionnel)</label>
+                        <input type="text" name="notes" value="{{ old('notes') }}"
+                               placeholder="Ex : acompte, solde…"
+                               class="form-input text-sm">
+                    </div>
+                    <button type="submit" class="btn-primary text-sm justify-center w-full">
+                        + Enregistrer le règlement
+                    </button>
+                </form>
+            </div>
+        </div>
+
         {{-- Avoirs liés --}}
         @if($order->credits && $order->credits->count())
         <div class="card overflow-hidden overflow-x-auto">
@@ -171,17 +285,27 @@
             <h2 class="font-semibold text-gray-900 mb-4">Paiement</h2>
             <div class="text-sm mb-4 space-y-1.5">
                 <div class="flex items-center justify-between">
-                    <span class="text-gray-500">Méthode</span>
-                    <span class="font-medium uppercase text-xs">{{ $order->payment_method }}</span>
-                </div>
-                <div class="flex items-center justify-between">
                     <span class="text-gray-500">Statut</span>
                     <span class="{{ $order->payment_status === 'paid' ? 'badge-green' : ($order->payment_status === 'partial' ? 'badge-yellow' : 'badge-red') }}">
                         {{ $order->payment_status_label }}
                     </span>
                 </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-500">Total</span>
+                    <span class="font-semibold">{{ number_format($order->total, 2, ',', ' ') }} €</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-500">Payé</span>
+                    <span class="font-semibold text-green-600">{{ number_format($order->paid_amount, 2, ',', ' ') }} €</span>
+                </div>
+                @if($order->remaining_amount > 0)
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-500">Reste dû</span>
+                    <span class="font-semibold text-amber-600">{{ number_format($order->remaining_amount, 2, ',', ' ') }} €</span>
+                </div>
+                @endif
                 @if($order->payment_link)
-                <div>
+                <div class="pt-1">
                     <a href="{{ $order->payment_link }}" target="_blank" class="text-indigo-600 hover:underline text-xs">Voir lien de paiement →</a>
                 </div>
                 @endif
@@ -189,19 +313,14 @@
 
             <form method="POST" action="{{ route('admin.orders.update-payment', $order) }}" class="space-y-2">
                 @csrf @method('PATCH')
-                <select name="payment_status" class="form-input">
-                    @foreach(\App\Models\Order::PAYMENT_STATUS_LABELS as $val => $label)
-                        <option value="{{ $val }}" @selected($order->payment_status === $val)>{{ $label }}</option>
-                    @endforeach
-                </select>
-                <select name="payment_method" class="form-input">
+                <select name="payment_method" class="form-input text-sm">
                     @foreach(['stripe' => 'Stripe', 'revolut' => 'Revolut', 'rib' => 'Virement RIB', 'cash' => 'Espèces'] as $val => $label)
                         <option value="{{ $val }}" @selected($order->payment_method === $val)>{{ $label }}</option>
                     @endforeach
                 </select>
                 <input type="url" name="payment_link" value="{{ $order->payment_link }}"
                        placeholder="Lien de paiement (Revolut…)" class="form-input text-sm">
-                <button type="submit" class="btn-secondary w-full justify-center text-sm">Sauvegarder paiement</button>
+                <button type="submit" class="btn-secondary w-full justify-center text-sm">Mettre à jour</button>
             </form>
 
             @if($order->payment_method === 'stripe')

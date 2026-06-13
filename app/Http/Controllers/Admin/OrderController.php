@@ -9,6 +9,7 @@ use App\Jobs\SendEmailNotification;
 use App\Mail\PaymentReceived;
 use App\Models\Credit;
 use App\Models\Order;
+use App\Models\OrderPayment;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
@@ -48,7 +49,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load('items.product', 'user', 'statusHistories.changedBy', 'creator', 'credits');
+        $order->load('items.product', 'user', 'statusHistories.changedBy', 'creator', 'credits', 'payments');
         return view('admin.orders.show', compact('order'));
     }
 
@@ -88,16 +89,55 @@ class OrderController extends Controller
     public function updatePayment(Request $request, Order $order)
     {
         $request->validate([
-            'payment_status' => 'required|in:unpaid,partial,paid',
             'payment_method' => 'required|in:stripe,revolut,rib,cash',
             'payment_link'   => 'nullable|url',
         ]);
 
-        $oldStatus = $order->payment_status;
-        $order->update($request->only(['payment_status', 'payment_method', 'payment_link']));
+        $order->update($request->only(['payment_method', 'payment_link']));
 
-        // Notifier le client si passage à "payé"
-        if ($oldStatus !== 'paid' && $request->payment_status === 'paid'
+        return back()->with('success', 'Informations de paiement mises à jour.');
+    }
+
+    public function storePayment(Request $request, Order $order)
+    {
+        $request->validate([
+            'amount'    => 'required|numeric|min:0.01|max:99999.99',
+            'method'    => 'required|in:cash,virement,revolut,stripe,cheque',
+            'reference' => 'nullable|string|max:255',
+            'paid_at'   => 'required|date',
+            'notes'     => 'nullable|string|max:500',
+        ]);
+
+        $order->payments()->create($request->only(['amount', 'method', 'reference', 'paid_at', 'notes']));
+        $this->syncPaymentStatus($order);
+
+        return back()->with('success', 'Règlement enregistré.');
+    }
+
+    public function destroyPayment(Order $order, OrderPayment $payment)
+    {
+        abort_if($payment->order_id !== $order->id, 403);
+        $payment->delete();
+        $this->syncPaymentStatus($order);
+
+        return back()->with('success', 'Règlement supprimé.');
+    }
+
+    private function syncPaymentStatus(Order $order): void
+    {
+        $paid  = (float) $order->payments()->sum('amount');
+        $total = (float) $order->total;
+
+        $newStatus = match (true) {
+            $paid <= 0          => 'unpaid',
+            $paid < $total      => 'partial',
+            default             => 'paid',
+        };
+
+        $oldStatus = $order->payment_status;
+        $order->update(['payment_status' => $newStatus]);
+
+        if ($oldStatus !== 'paid' && $newStatus === 'paid'
             && Setting::get('notif_payment_received', '1')) {
             $order->load('user', 'items.product');
             SendEmailNotification::dispatch(
@@ -106,8 +146,6 @@ class OrderController extends Controller
                 'paiement reçu ' . $order->reference,
             )->onQueue('notifications');
         }
-
-        return back()->with('success', 'Paiement mis à jour.');
     }
 
     public function generateStripeLink(Order $order)
