@@ -1,24 +1,73 @@
 #!/bin/sh
 set -e
 
-cd /var/www/html
+cd /app
 
-# Créer les répertoires nécessaires
+# Répertoires nécessaires
 mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
 
-# Permissions
+# Permissions pour php-fpm (user ubuntu)
+chown -R ubuntu:ubuntu /app/storage /app/bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
-# Symlink storage
+# Symlink storage public
 php artisan storage:link --force
 
-# Migrations auto
+# Migrations
 php artisan migrate --force
 
-# Caches
+# Caches Laravel
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Démarrer nginx + php-fpm via supervisord
-exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+# Config nginx (inline pour compatibilité Nix — pas d'include mime.types)
+cat > /tmp/nginx.conf << 'EOF'
+events {}
+
+http {
+    types {
+        text/html                             html htm;
+        text/css                              css;
+        application/javascript                js;
+        application/json                      json;
+        image/png                             png;
+        image/jpeg                            jpeg jpg;
+        image/gif                             gif;
+        image/webp                            webp;
+        image/svg+xml                         svg;
+        image/x-icon                          ico;
+        font/woff                             woff;
+        font/woff2                            woff2;
+        application/octet-stream              bin;
+    }
+
+    server {
+        listen 8000;
+        root /app/public;
+        index index.php;
+
+        location / {
+            try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        location ~ \.php$ {
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param DOCUMENT_ROOT $document_root;
+            include /etc/nginx/fastcgi_params;
+        }
+
+        location ~ /\.(?!well-known).* {
+            deny all;
+        }
+    }
+}
+EOF
+
+# Démarrer php-fpm en arrière-plan
+php-fpm -D
+
+# Démarrer nginx au premier plan
+exec nginx -c /tmp/nginx.conf -g "daemon off;"
