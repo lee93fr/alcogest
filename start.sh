@@ -66,8 +66,8 @@ http {
 }
 EOF
 
-# Démarrer php-fpm en arrière-plan
-php-fpm -D
+# Démarrer php-fpm en arrière-plan (--nodaemonize car géré par le &)
+php-fpm --nodaemonize &
 
 # Démarrer nginx au premier plan
 exec nginx -c /tmp/nginx.conf -g "daemon off;"
