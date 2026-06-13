@@ -80,8 +80,24 @@ http {
 }
 EOF
 
-# Démarrer php-fpm en arrière-plan (--nodaemonize car géré par le &)
-php-fpm --nodaemonize &
+# Config php-fpm inline (évite la dépendance au chemin /nix/store/...)
+cat > /tmp/php-fpm.conf << 'FPMEOF'
+[global]
+error_log = /proc/self/fd/2
+daemonize = no
+
+[www]
+listen = 127.0.0.1:9000
+pm = dynamic
+pm.max_children = 10
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 5
+clear_env = no
+FPMEOF
+
+# Démarrer php-fpm en arrière-plan
+php-fpm -y /tmp/php-fpm.conf &
 
 # Démarrer nginx au premier plan
 exec nginx -c /tmp/nginx.conf -g "daemon off;"
