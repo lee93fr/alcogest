@@ -32,6 +32,18 @@
             #sidebar      { width: 16rem !important; transform: translateX(-100%); transition: transform 0.2s ease; }
             #main-content { padding-left: 0 !important; }
             body.sidebar-open #sidebar { transform: translateX(0); }
+
+            /* Le mode "réduit" (icônes seules) ne doit jamais s'appliquer sur
+               mobile : le drawer affiche toujours les libellés en entier, même
+               si l'utilisateur a réduit la barre sur desktop (préférence
+               conservée dans localStorage). Sinon les menus paraissent tronqués. */
+            body.sidebar-collapsed #sidebar           { width: 16rem !important; }
+            body.sidebar-collapsed .sidebar-label,
+            body.sidebar-collapsed .sidebar-user,
+            body.sidebar-collapsed .sidebar-logo-text,
+            body.sidebar-collapsed .sidebar-divider   { display: revert; }
+            body.sidebar-collapsed .sidebar-link      { justify-content: flex-start; padding-left: 0.75rem; padding-right: 0.75rem; }
+            body.sidebar-collapsed .sidebar-icon      { margin: 0; }
         }
 
         /* Masquer prix d'achat / marges */

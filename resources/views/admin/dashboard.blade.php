@@ -53,7 +53,7 @@
                         </span>
                     </td>
                     <td class="px-6 py-3">
-                        <span class="{{ $order->payment_status === 'paid' ? 'badge-green' : ($order->payment_status === 'partial' ? 'badge-yellow' : 'badge-red') }}">
+                        <span class="{{ $order->payment_status_badge }}">
                             {{ $order->payment_status_label }}
                         </span>
                     </td>

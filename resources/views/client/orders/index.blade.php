@@ -27,7 +27,7 @@
                         <span class="{{ $order->status === 'delivered' ? 'badge-green' : ($order->status === 'cancelled' ? 'badge-red' : 'badge-blue') }}">
                             {{ $order->status_label }}
                         </span>
-                        <span class="{{ $order->payment_status === 'paid' ? 'badge-green' : ($order->payment_status === 'partial' ? 'badge-yellow' : 'badge-red') }}">
+                        <span class="{{ $order->payment_status_badge }}">
                             {{ $order->payment_status_label }}
                         </span>
                     </div>
