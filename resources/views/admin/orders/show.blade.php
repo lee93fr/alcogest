@@ -286,7 +286,7 @@
             <div class="text-sm mb-4 space-y-1.5">
                 <div class="flex items-center justify-between">
                     <span class="text-gray-500">Statut</span>
-                    <span class="{{ $order->payment_status === 'paid' ? 'badge-green' : ($order->payment_status === 'partial' ? 'badge-yellow' : 'badge-red') }}">
+                    <span class="{{ $order->payment_status_badge }}">
                         {{ $order->payment_status_label }}
                     </span>
                 </div>

@@ -32,11 +32,11 @@ body { font-family: Arial, sans-serif; background: #f1f5f9; margin: 0; padding: 
                 <tr><td>Référence</td><td>{{ $order->reference }}</td></tr>
                 <tr><td>Date d'annulation</td><td>{{ now()->format('d/m/Y à H:i') }}</td></tr>
                 <tr><td>Montant</td><td>{{ number_format($order->total, 2, ',', ' ') }} €</td></tr>
-                <tr><td>Statut paiement</td><td>{{ $order->payment_status === 'paid' ? 'Payé — remboursement en cours' : 'Non débité' }}</td></tr>
+                <tr><td>Statut paiement</td><td>{{ $order->payment_status === 'refunded' ? 'Payé — remboursement en cours' : 'Non débité' }}</td></tr>
             </table>
         </div>
 
-        @if($order->payment_status === 'paid')
+        @if($order->payment_status === 'refunded')
         <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:12px 16px; font-size:13px; color:#92400e;">
             Votre commande ayant été payée, un avoir ou un remboursement sera traité prochainement. Contactez-nous pour plus d'informations.
         </div>

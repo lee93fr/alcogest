@@ -12,7 +12,7 @@
         <span class="{{ $order->status === 'delivered' ? 'badge-green' : ($order->status === 'cancelled' ? 'badge-red' : 'badge-blue') }} text-sm px-3 py-1">
             {{ $order->status_label }}
         </span>
-        <span class="{{ $order->payment_status === 'paid' ? 'badge-green' : ($order->payment_status === 'partial' ? 'badge-yellow' : 'badge-red') }} text-sm px-3 py-1">
+        <span class="{{ $order->payment_status_badge }} text-sm px-3 py-1">
             {{ $order->payment_status_label }}
         </span>
         @can('cancel', $order)

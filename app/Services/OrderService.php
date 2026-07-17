@@ -202,7 +202,18 @@ class OrderService
         $oldStatus = $order->status;
 
         DB::transaction(function () use ($order, $newStatus, $adminId, $oldStatus, $comment) {
-            $order->update(['status' => $newStatus]);
+            $attributes = ['status' => $newStatus];
+
+            if ($newStatus === 'cancelled') {
+                // Annulation : le paiement ne doit plus rester "à payer".
+                $attributes['payment_status'] = $order->paymentStatusForCancellation();
+            } elseif ($oldStatus === 'cancelled'
+                && in_array($order->payment_status, ['refunded', 'cancelled'], true)) {
+                // Réactivation d'une commande annulée : on restaure un statut cohérent.
+                $attributes['payment_status'] = $order->recomputePaymentStatusFromPayments();
+            }
+
+            $order->update($attributes);
             $this->recordStatusChange($order, $adminId, $oldStatus, $newStatus, $comment);
         });
 

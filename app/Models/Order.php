@@ -47,9 +47,19 @@ class Order extends Model
     ];
 
     public const PAYMENT_STATUS_LABELS = [
-        'unpaid'  => '❌ Non payé',
-        'partial' => '⚠️ Partiellement payé',
-        'paid'    => '✅ Payé',
+        'unpaid'    => '❌ Non payé',
+        'partial'   => '⚠️ Partiellement payé',
+        'paid'      => '✅ Payé',
+        'refunded'  => '↩️ Remboursé',
+        'cancelled' => '⛔ Annulé',
+    ];
+
+    public const PAYMENT_STATUS_BADGES = [
+        'unpaid'    => 'badge-red',
+        'partial'   => 'badge-yellow',
+        'paid'      => 'badge-green',
+        'refunded'  => 'badge-gray',
+        'cancelled' => 'badge-gray',
     ];
 
     public function getStatusLabelAttribute(): string
@@ -60,6 +70,36 @@ class Order extends Model
     public function getPaymentStatusLabelAttribute(): string
     {
         return self::PAYMENT_STATUS_LABELS[$this->payment_status] ?? $this->payment_status;
+    }
+
+    public function getPaymentStatusBadgeAttribute(): string
+    {
+        return self::PAYMENT_STATUS_BADGES[$this->payment_status] ?? 'badge-red';
+    }
+
+    /**
+     * Statut de paiement à appliquer lorsqu'une commande est annulée :
+     * remboursé si des sommes ont déjà été encaissées, annulé sinon.
+     */
+    public function paymentStatusForCancellation(): string
+    {
+        return $this->paid_amount > 0 ? 'refunded' : 'cancelled';
+    }
+
+    /**
+     * Recalcule le statut de paiement à partir des règlements enregistrés.
+     * Sert notamment à restaurer un statut cohérent si une commande annulée
+     * est réactivée.
+     */
+    public function recomputePaymentStatusFromPayments(): string
+    {
+        $paid = $this->paid_amount;
+
+        return match (true) {
+            $paid <= 0                    => 'unpaid',
+            $paid < (float) $this->total  => 'partial',
+            default                       => 'paid',
+        };
     }
 
     public function user()            { return $this->belongsTo(User::class)->withTrashed(); }
@@ -79,6 +119,10 @@ class Order extends Model
 
     public function getRemainingAmountAttribute(): float
     {
+        if (in_array($this->payment_status, ['refunded', 'cancelled'], true)) {
+            return 0.0;
+        }
+
         return max(0, (float) $this->total - $this->paid_amount);
     }
 

@@ -68,7 +68,10 @@ class OrderController extends Controller
         $this->authorize('cancel', $order);
 
         $order->load('user', 'items.product');
-        $order->update(['status' => 'cancelled']);
+        $order->update([
+            'status'         => 'cancelled',
+            'payment_status' => $order->paymentStatusForCancellation(),
+        ]);
 
         if (Setting::get('notif_order_cancelled', '1')) {
             SendEmailNotification::dispatch(
