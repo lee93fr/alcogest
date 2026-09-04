@@ -43,7 +43,7 @@ http {
     }
 
     server {
-        listen 8000;
+        listen 4000;
         root /app/public;
         index index.php;
 
@@ -87,6 +87,8 @@ error_log = /proc/self/fd/2
 daemonize = no
 
 [www]
+user = www-data
+group = www-data
 listen = 127.0.0.1:9000
 pm = dynamic
 pm.max_children = 10
@@ -95,6 +97,10 @@ pm.min_spare_servers = 1
 pm.max_spare_servers = 5
 clear_env = no
 FPMEOF
+
+# Vérifier les configurations avant de déclarer le conteneur démarré.
+php-fpm -t -y /tmp/php-fpm.conf
+nginx -t -c /tmp/nginx.conf
 
 # Démarrer php-fpm en arrière-plan
 php-fpm -y /tmp/php-fpm.conf &
