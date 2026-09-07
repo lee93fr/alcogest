@@ -46,6 +46,7 @@ http {
         listen 4000;
         root /app/public;
         index index.php;
+        add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex" always;
 
         location / {
             try_files $uri $uri/ /index.php?$query_string;
@@ -107,3 +108,4 @@ php-fpm -y /tmp/php-fpm.conf &
 
 # Démarrer nginx au premier plan
 exec nginx -c /tmp/nginx.conf -g "daemon off;"
+
