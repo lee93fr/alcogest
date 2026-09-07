@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr" class="h-full">
 <head>
     <meta charset="UTF-8">
@@ -8,7 +8,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full bg-stone-50 text-gray-900 font-sans antialiased">
+<body class="h-full client-shell text-gray-900 font-sans antialiased">
 
 {{-- ========== NAVBAR ========== --}}
 <style>
@@ -19,24 +19,24 @@
     #nav-mobile  { display: none; }
 }
 </style>
-<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
+<header class="site-header sticky top-0 z-50 backdrop-blur-md border-b">
 
     {{-- Barre desktop --}}
     <div id="nav-desktop" class="max-w-7xl mx-auto px-6 h-16 items-center justify-between gap-6">
         <a href="{{ route('catalog.index') }}" class="flex items-center gap-2 shrink-0">
             <img src="/images/logo-la-tournee.svg" alt="La Tournée" class="h-9 w-9">
-            <span class="text-xl font-bold tracking-tight text-gray-900">La Tournée!</span>
+            <span class="brand-wordmark text-2xl text-wine-900">La Tournée!</span>
         </a>
 
         <nav class="flex items-center gap-6 text-sm font-medium text-gray-600">
-            <a href="{{ route('catalog.index') }}" class="hover:text-gray-900 transition-colors {{ request()->routeIs('catalog*') ? 'text-gray-900 font-semibold' : '' }}">
+            <a href="{{ route('catalog.index') }}" class="site-nav-link transition-colors {{ request()->routeIs('catalog*') ? 'is-active font-semibold' : '' }}">
                 Catalogue
             </a>
             @auth
-                <a href="{{ route('client.orders.index') }}" class="hover:text-gray-900 transition-colors {{ request()->routeIs('client.orders*') ? 'text-gray-900 font-semibold' : '' }}">Mes commandes</a>
-                <a href="{{ route('client.profile.edit') }}" class="hover:text-gray-900 transition-colors {{ request()->routeIs('client.profile*') ? 'text-gray-900 font-semibold' : '' }}">Profil</a>
+                <a href="{{ route('client.orders.index') }}" class="site-nav-link transition-colors {{ request()->routeIs('client.orders*') ? 'is-active font-semibold' : '' }}">Mes commandes</a>
+                <a href="{{ route('client.profile.edit') }}" class="site-nav-link transition-colors {{ request()->routeIs('client.profile*') ? 'is-active font-semibold' : '' }}">Profil</a>
                 @if(auth()->user()->isAdmin())
-                    <a href="{{ route('admin.dashboard') }}" class="text-indigo-600 font-semibold hover:text-indigo-800">Admin →</a>
+                    <a href="{{ route('admin.dashboard') }}" class="text-wine-700 font-bold hover:text-wine-900">Admin →</a>
                 @endif
             @endauth
         </nav>
@@ -49,10 +49,10 @@
                 $cartTotal   = $cartService->total();
             @endphp
             <a href="{{ route('client.cart') }}"
-               class="relative inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 transition-colors">
+               class="cart-pill relative inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-sm font-bold hover:bg-white transition-colors">
                 🛒 Panier
                 <span id="cart-count" data-cart-count
-                      class="{{ $cartCount > 0 ? 'inline-flex' : 'hidden' }} items-center justify-center h-5 w-5 rounded-full bg-indigo-600 text-white text-xs font-bold">{{ $cartCount > 0 ? $cartCount : '' }}</span>
+                      class="{{ $cartCount > 0 ? 'inline-flex' : 'hidden' }} items-center justify-center h-5 w-5 rounded-full bg-wine-700 text-white text-xs font-bold">{{ $cartCount > 0 ? $cartCount : '' }}</span>
                 <span data-cart-total
                       class="{{ $cartTotal > 0 ? '' : 'hidden' }} pl-2 ml-1 border-l border-gray-200 font-semibold text-gray-900 whitespace-nowrap">{{ number_format($cartTotal, 2, ',', ' ') }} €</span>
             </a>
@@ -62,7 +62,7 @@
             </form>
             @else
             <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900">Connexion</a>
-            <a href="{{ route('register') }}" class="px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-indigo-600 transition-colors">S'inscrire</a>
+            <a href="{{ route('register') }}" class="btn-primary">S'inscrire</a>
             @endauth
         </div>
     </div>
@@ -71,7 +71,7 @@
     <div id="nav-mobile" class="px-4 h-14 items-center justify-between gap-3">
         <a href="{{ route('catalog.index') }}" class="flex items-center gap-2 shrink-0">
             <img src="/images/logo-la-tournee.svg" alt="La Tournée" class="h-8 w-8">
-            <span class="text-lg font-bold tracking-tight text-gray-900">La Tournée!</span>
+            <span class="brand-wordmark text-xl text-wine-900">La Tournée!</span>
         </a>
 
         <div class="flex items-center gap-2">
@@ -164,9 +164,11 @@
     @yield('content')
 </main>
 
-<footer class="mt-16 border-t border-gray-200 bg-white">
-    <div class="max-w-7xl mx-auto px-6 py-8 text-center text-sm text-gray-400">
-        © {{ date('Y') }} La Tournée!. Tous droits réservés. — La consommation d'alcool est déconseillée aux moins de 18 ans.
+<footer class="mt-16 border-t border-wine-900/10 bg-white/60">
+    <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-stone-400">
+        <span class="brand-wordmark text-lg text-wine-900">La Tournée!</span>
+        <span>© {{ date('Y') }} Tous droits réservés.</span>
+        <span>À consommer avec modération.</span>
     </div>
 </footer>
 

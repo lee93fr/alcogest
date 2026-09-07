@@ -9,9 +9,10 @@
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <div class="mb-6 text-center">
-        <h1 class="text-xl font-bold text-gray-900">La Tournée!</h1>
-        <p class="text-sm text-gray-500 mt-1">Connectez-vous pour accéder à votre espace.</p>
+    <div class="mb-8">
+        <p class="brand-eyebrow mb-3">Heureux de vous revoir</p>
+        <h1 class="display-font text-4xl text-wine-950">Connexion</h1>
+        <p class="text-sm text-stone-500 mt-2 leading-6">Accédez à votre catalogue, vos commandes et votre espace de gestion.</p>
     </div>
 
     <form method="POST" action="{{ route('login') }}">
@@ -34,20 +35,21 @@
         <div class="block mt-4">
             <label for="remember_me" class="inline-flex items-center">
                 <input id="remember_me" type="checkbox"
-                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                       class="rounded border-stone-300 text-wine-700 shadow-sm focus:ring-wine-600"
                        name="remember">
                 <span class="ms-2 text-sm text-gray-600">Se souvenir de moi</span>
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
+        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-4 mt-7">
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                <a class="text-sm font-semibold text-stone-500 hover:text-wine-700 rounded-md transition-colors"
                    href="{{ route('password.request') }}">
                     Mot de passe oublié ?
                 </a>
             @endif
-            <x-primary-button class="ms-3">Se connecter</x-primary-button>
+            <x-primary-button class="w-full sm:w-auto">Se connecter <span class="ml-2">→</span></x-primary-button>
         </div>
     </form>
 </x-guest-layout>
+

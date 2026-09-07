@@ -3,9 +3,12 @@
 @section('title', 'Catalogue')
 
 @section('content')
-<div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">Notre catalogue</h1>
-    <p class="text-gray-500 mt-1">Sélectionnez vos produits et passez commande en quelques clics.</p>
+<div class="catalog-hero mb-8">
+    <div class="relative z-10 max-w-2xl">
+        <p class="brand-eyebrow mb-3">La sélection du moment</p>
+        <h1 class="display-font text-4xl sm:text-5xl">Notre catalogue</h1>
+        <p class="text-white/70 mt-3">Des références choisies avec soin, prêtes à rejoindre votre prochaine tournée.</p>
+    </div>
 </div>
 
 @php $currentSearch = request('search'); @endphp
@@ -107,7 +110,7 @@
         {{-- VUE GRILLE --}}
         <div id="catalog-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
             @foreach($products as $product)
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
+            <div class="product-card rounded-2xl overflow-hidden group">
                 <div class="relative">
                     @if($product->is_new)
                     <span class="absolute top-2 left-2 z-10 px-2 py-0.5 bg-amber-400 text-white text-xs font-bold rounded-full shadow-sm tracking-wide">NEW</span>
@@ -184,7 +187,7 @@
 
         <div id="catalog-list" class="hidden space-y-3">
             @foreach($products as $product)
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <div class="product-card rounded-2xl">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4">
                     <div class="flex items-center gap-4 min-w-0">
                     <div class="relative shrink-0">
@@ -305,3 +308,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endsection
+

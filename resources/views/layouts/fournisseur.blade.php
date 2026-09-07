@@ -7,14 +7,14 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full font-sans antialiased">
+<body class="h-full font-sans antialiased supplier-shell">
 
 <div class="min-h-full flex flex-col">
 
-    <header class="bg-white border-b border-gray-200 h-14 flex items-center px-4 md:px-6 gap-3 sticky top-0 z-40">
+    <header class="supplier-topbar border-b h-16 flex items-center px-4 md:px-6 gap-3 sticky top-0 z-40">
         <a href="{{ route('fournisseur.products.index') }}" class="flex items-center gap-2 min-w-0">
             <img src="/images/logo-la-tournee.svg" alt="La Tournée" class="h-8 w-8 flex-shrink-0">
-            <span class="text-base font-bold text-gray-900 tracking-tight hidden sm:inline">
+            <span class="brand-wordmark text-xl text-wine-900 hidden sm:inline">
                 La Tournée! <span class="font-normal text-gray-400 text-sm">— Fournisseur</span>
             </span>
         </a>
@@ -60,3 +60,4 @@
 
 </body>
 </html>
+

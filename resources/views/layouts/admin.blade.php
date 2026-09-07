@@ -51,7 +51,7 @@
         body.hide-costs .col-margin { display: none !important; }
     </style>
 </head>
-<body class="h-full font-sans antialiased">
+<body class="h-full font-sans antialiased admin-shell">
 
 <div class="min-h-full flex">
 
@@ -61,13 +61,13 @@
          onclick="closeMobileSidebar()"></div>
 
     {{-- Sidebar --}}
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 bg-gray-900 flex flex-col overflow-hidden">
+    <aside id="sidebar" class="admin-sidebar fixed inset-y-0 left-0 z-50 flex flex-col overflow-hidden">
 
         {{-- Logo --}}
         <div class="flex h-16 items-center px-4 border-b border-gray-700/50 flex-shrink-0">
             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 min-w-0">
                 <img src="/images/logo-la-tournee.svg" alt="La Tournée" class="h-8 w-8 flex-shrink-0 brightness-0 invert">
-                <span class="sidebar-logo-text text-sm font-bold text-white tracking-tight whitespace-nowrap">La Tournée!</span>
+                <span class="sidebar-logo-text brand-wordmark text-xl text-white whitespace-nowrap">La Tournée!</span>
             </a>
             {{-- Fermer drawer mobile --}}
             <button onclick="closeMobileSidebar()" class="ml-auto text-gray-400 hover:text-white md:hidden flex-shrink-0">
@@ -97,7 +97,7 @@
                title="{{ $item['label'] }}"
                class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap
                       {{ request()->routeIs($item['match'])
-                         ? 'bg-indigo-600 text-white'
+                         ? 'is-active text-white'
                          : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
                 <span class="sidebar-icon text-base flex-shrink-0">{{ $item['icon'] }}</span>
                 <span class="sidebar-label">{{ $item['label'] }}</span>
@@ -108,8 +108,8 @@
             <div class="sidebar-divider pt-3 mt-3 border-t border-gray-700/50">
                 <a href="{{ route('admin.settings.edit') }}"
                    title="Paramètres"
-                   class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors whitespace-nowrap
-                          {{ request()->routeIs('admin.settings*') ? 'bg-indigo-600 text-white' : '' }}">
+                   class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:text-white transition-colors whitespace-nowrap
+                          {{ request()->routeIs('admin.settings*') ? 'is-active text-white' : '' }}">
                     <span class="sidebar-icon text-base flex-shrink-0">⚙️</span>
                     <span class="sidebar-label">Paramètres</span>
                 </a>
@@ -167,14 +167,14 @@
     <div id="main-content" class="flex flex-col flex-1 min-h-full min-w-0">
 
         {{-- Header --}}
-        <header class="sticky top-0 z-40 bg-white border-b border-gray-200 flex flex-wrap items-center px-4 md:px-6 gap-x-3 gap-y-2 py-3 md:h-16 md:py-0">
+        <header class="admin-topbar sticky top-0 z-40 border-b flex flex-wrap items-center px-4 md:px-6 gap-x-3 gap-y-2 py-3 md:h-16 md:py-0">
             {{-- Hamburger mobile --}}
             <button onclick="openMobileSidebar()" class="md:hidden text-gray-500 hover:text-gray-900 flex-shrink-0">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
             </button>
-            <h1 class="text-base md:text-lg font-semibold text-gray-900 truncate">@yield('header', 'Dashboard')</h1>
+            <h1 class="display-font text-xl md:text-2xl text-wine-950 truncate">@yield('header', 'Dashboard')</h1>
             <div class="ml-auto flex items-center gap-2 flex-wrap">
                 @yield('header-actions')
             </div>
@@ -192,7 +192,7 @@
         </div>
         @endif
 
-        <main class="flex-1 px-4 md:px-6 py-6">
+        <main class="admin-content flex-1 px-4 md:px-6 py-6">
             @yield('content')
         </main>
     </div>
@@ -275,3 +275,4 @@ window.addEventListener('resize', function() {
 
 </body>
 </html>
+
