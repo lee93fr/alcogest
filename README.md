@@ -34,7 +34,9 @@ npm install
 
 ```bash
 php artisan key:generate
-php artisan migrate --seed
+php artisan migrate
+# Pour une base de démonstration uniquement :
+php artisan db:seed
 php artisan storage:link
 ```
 
@@ -46,7 +48,15 @@ npm run build
 npm run dev
 ```
 
-### 5. Démarrer le worker de queue
+### 5. Démarrer le serveur et le worker de queue
+
+Dans un terminal :
+
+```bash
+php artisan serve
+```
+
+Dans un autre terminal, après avoir configuré Redis :
 
 ```bash
 php artisan queue:work --queue=notifications,default
@@ -61,7 +71,7 @@ php artisan queue:work --queue=notifications,default
 | admin@alcogest.fr | password | super_admin |
 | client@alcogest.fr | password | client |
 
-> ⚠️ **Changez les mots de passe en production !**
+> Ces comptes sont destinés aux données de démonstration. Ne lancez pas ce seeder sur une base de production ; créez des comptes avec des mots de passe sûrs.
 
 ---
 
@@ -82,7 +92,7 @@ app/
 ├── Policies/           # OrderPolicy, ProductPolicy
 └── Imports/            # ProductsImport (CSV/Excel)
 
-database/migrations/    # 9 migrations dans l'ordre de dépendance
+database/migrations/    # migrations du schéma
 resources/views/
 ├── layouts/            # admin.blade.php, client.blade.php
 ├── admin/              # dashboard, orders, products, categories, supplier-orders
@@ -98,7 +108,7 @@ routes/
 
 ## Routes principales
 
-### Public
+### Catalogue (compte authentifié et actif)
 - `GET /catalogue` — Catalogue produits
 - `GET /catalogue/{slug}` — Fiche produit
 
