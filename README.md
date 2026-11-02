@@ -1,5 +1,7 @@
 # 🍾 AlcoGest — Application de gestion de commandes d'alcool
 
+Version initiale déclarée à cette révision : **0.1.0** (voir [package.json](package.json)). Cette déclaration ne correspond pas à une release publiée.
+
 ## Stack
 
 - **Backend** : PHP 8.2 / Laravel 11
