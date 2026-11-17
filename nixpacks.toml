@@ -1,3 +1,8 @@
+[phases.setup]
+# NixOS 26.05 revision with PHP 8.4.27 and the October 2026 security fixes.
+nixpkgsArchive = "f68407657ad294471eb4b2e65d193df26edf729f"
+nixPkgs = ["php84", "php84Packages.composer", "nginx", "libmysqlclient", "nodejs_22", "npm-9_x"]
+
 [phases.build]
 cmds = [
     "composer install --no-dev --optimize-autoloader",
